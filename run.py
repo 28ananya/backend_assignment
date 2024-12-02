@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])  # Enable CORS for the React frontend
+CORS(app)  # Enable CORS for the React frontend
 
 # MongoDB connection
 client = MongoClient("mongodb://localhost:27017")
