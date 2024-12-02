@@ -2,15 +2,18 @@ from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-
+import os
 app = Flask(__name__)
-CORS(app)  # Enable CORS for the React frontend
+
+# Allow the frontend URL hosted on Render
+CORS(app, origins=["https://frontend-todo-que7.onrender.com"])
 
 # MongoDB connection
 client = MongoClient("mongodb://localhost:27017")
 db = client.todo_database
 todo_tasks = db.todo_tasks
 
+# Define routes
 @app.route('/api/todos', methods=['GET'])
 def get_tasks():
     tasks = list(todo_tasks.find())
@@ -66,4 +69,5 @@ def delete_all_tasks():
     return '', 204
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))  # Use the Render-provided port
+    app.run(debug=True, host="0.0.0.0", port=port)
