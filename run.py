@@ -11,8 +11,10 @@ CORS(app)
 
 # MongoDB connection
 def get_mongo_client():
-    # Establish MongoDB client inside the function to avoid connection issues in multi-threaded environments
-    return MongoClient("mongodb://localhost:27017/todo_db")
+    mongo_uri = os.environ.get("MONGO_URI")
+    client = MongoClient(mongo_uri)
+    return client
+
 
 @app.route('/', methods=['GET'])
 def home():
