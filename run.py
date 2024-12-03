@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 # Allow the frontend URL hosted on Render
-CORS(app)
+CORS(app,origin=["http://localhost:3000"])
 
 # MongoDB connection
 client = MongoClient("mongodb://localhost:27017")
