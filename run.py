@@ -3,19 +3,26 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import os
+
 app = Flask(__name__)
 
 # Allow the frontend URL hosted on Render
-CORS(app,origin=["http://localhost:3000"])
+CORS(app, origin=["http://localhost:3000"])
 
 # MongoDB connection
-client = MongoClient("mongodb://localhost:27017/todo_db")
-db = client.todo_database
-todo_tasks = db.todo_tasks
+def get_mongo_client():
+    # Establish MongoDB client inside the function to avoid connection issues in multi-threaded environments
+    return MongoClient("mongodb://localhost:27017")
 
-# Define routes
+@app.route('/', methods=['GET'])
+def home():
+    return "Welcome to the Todo API!"
+
 @app.route('/api/todos', methods=['GET'])
 def get_tasks():
+    client = get_mongo_client()  # Create a new connection for each request
+    db = client.todo_database
+    todo_tasks = db.todo_tasks
     tasks = list(todo_tasks.find())
     for task in tasks:
         task['_id'] = str(task['_id'])  # Convert ObjectId to string for JSON serialization
@@ -27,6 +34,10 @@ def add_task():
     if not data or 'title' not in data:
         abort(400, 'Title is required')
     
+    client = get_mongo_client()  # Create a new connection for each request
+    db = client.todo_database
+    todo_tasks = db.todo_tasks
+
     task = {
         'title': data['title'],
         'description': data.get('description', ''),
@@ -41,6 +52,11 @@ def add_task():
 @app.route('/api/todos/<task_id>', methods=['PUT'])
 def update_task(task_id):
     data = request.get_json()
+    
+    client = get_mongo_client()  # Create a new connection for each request
+    db = client.todo_database
+    todo_tasks = db.todo_tasks
+    
     task = todo_tasks.find_one({'_id': ObjectId(task_id)})
     if not task:
         abort(404, 'Task not found')
@@ -58,6 +74,10 @@ def update_task(task_id):
 
 @app.route('/api/todos/<task_id>', methods=['DELETE'])
 def delete_task(task_id):
+    client = get_mongo_client()  # Create a new connection for each request
+    db = client.todo_database
+    todo_tasks = db.todo_tasks
+
     result = todo_tasks.delete_one({'_id': ObjectId(task_id)})
     if result.deleted_count == 0:
         abort(404, 'Task not found')
@@ -65,6 +85,10 @@ def delete_task(task_id):
 
 @app.route('/api/todos/all', methods=['DELETE'])
 def delete_all_tasks():
+    client = get_mongo_client()  # Create a new connection for each request
+    db = client.todo_database
+    todo_tasks = db.todo_tasks
+    
     todo_tasks.delete_many({})
     return '', 204
 
