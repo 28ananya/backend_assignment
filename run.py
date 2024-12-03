@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app,origin=["http://localhost:3000"])
 
 # MongoDB connection
-client = MongoClient("mongodb://localhost:27017")
+client = MongoClient("mongodb://localhost:27017/todo_db")
 db = client.todo_database
 todo_tasks = db.todo_tasks
 

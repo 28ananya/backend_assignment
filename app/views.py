@@ -1,14 +1,12 @@
 from flask import Blueprint, request, jsonify, abort
 from app import mongo
 from bson.objectid import ObjectId  # Import ObjectId correctly
-
-todo_bp = Blueprint('todo', __name__, url_prefix='/api/todos')
-
 # 1. Add a new To-Do Task
 from flask_cors import cross_origin
 
-@todo_bp.route('/', methods=['POST'])
-@cross_origin(origins=["http://localhost:3000"])  # Allow CORS only for this route
+todo_bp = Blueprint('todo', __name__, url_prefix='/api/todos')
+@cross_origin(origins=["http://localhost:3000"]) 
+@todo_bp.route('/', methods=['POST']) # Allow CORS only for this route
 def add_task():
     data = request.get_json()
     if not data or 'title' not in data:
